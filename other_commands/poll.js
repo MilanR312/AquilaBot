@@ -41,21 +41,25 @@ module.exports = {
             const Titel = interaction.options.getString('title');
             const Description = interaction.options.getString('description');
 
+            //generate new poll with previous data
             let Polltest = new Poll(Titel, Description);
             ActivePolls.push(Polltest);
             lastActivePoll = Polltest;
-
+            //send the current poll
             interaction.reply({ embeds: [Polltest.mainPoll] , ephemeral: true});
         }
         else if (subcommand === 'addquestion') {
             const Question = interaction.options.getString('question');
             const Answer = interaction.options.getString('answer');
-
+            
+            //add the question to the active poll
             lastActivePoll.addQuestion(Question,Answer);
 
+            //send the current poll
             PrintEmbeds(interaction, lastActivePoll.getEmbeds(), true)
         }
         else if (subcommand === 'confirm') {
+            //send the poll and add reactions
             PrintEmbeds(interaction, lastActivePoll.getEmbeds(), false)
         }
     }

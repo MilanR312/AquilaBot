@@ -7,15 +7,7 @@ class SubPoll {
         this.len = this.Answers.length
         this.Fields = []
 
-        console.log(this.Answers);
-        console.log(this.Question)
-
-        const obj = {
-            name : "default",
-            value : "default",
-            inline : false
-        }
-
+        //generate fields object for every answer
         this.Answers.forEach( (element, index) => {
             const obj = {
                 name : "default",
@@ -27,8 +19,7 @@ class SubPoll {
             this.Fields.push(obj);
         });
 
-        console.log(this.Fields)
-
+        //generate the embed
         this.embed = new MessageEmbed()
             .setTitle(this.Question)
             .setColor('#0099ff')
@@ -55,23 +46,26 @@ class Poll {//uptime, amount of questions, answers per question, pinned?, ceator
     }
 
     addQuestion(Question, Answer){
+        //add a question with answers via a subpoll class
         const newQuestion = new SubPoll(Question,Answer);
         this.Questions.push(newQuestion);
         console.log("added")
     }
     getEmbeds(){
         this.out = [this.mainPoll]
+        //return every embed with the amount of answers
         this.Questions.forEach(element => {
             this.out.push([element.embed,element.len])
         })
         return this.out
     }
 }
-emojiLookup = ["🇦", "🇧","🇨"]
+emojiLookup = ["🇦","🇧","🇨"]
 async function PrintEmbeds(interaction, data, eph){
     const [main, ...rest] = data;
         await interaction.reply({ embeds: [main], ephemeral: eph})
         for (const element of rest){
+            //for every subpoll send it and add the required reactions
             const message = await interaction.followUp({embeds: [element[0]], ephemeral: eph, fetchReply: true})
             console.log(message)
             if (eph) continue;
