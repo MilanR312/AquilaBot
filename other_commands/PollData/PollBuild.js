@@ -63,15 +63,22 @@ class Poll {//uptime, amount of questions, answers per question, pinned?, ceator
 emojiLookup = ["🇦","🇧","🇨"]
 async function PrintEmbeds(interaction, data, eph){
     const [main, ...rest] = data;
-        await interaction.reply({ embeds: [main], ephemeral: eph})
-        for (const element of rest){
-            //for every subpoll send it and add the required reactions
-            const message = await interaction.followUp({embeds: [element[0]], ephemeral: eph, fetchReply: true})
-            console.log(message)
-            if (eph) continue;
-            for (i = 0; i < element[1]; i++){
-                message.react(emojiLookup[i])
-            }
+    await interaction.reply({ embeds: [main], ephemeral: eph})
+    console.log(interaction)
+    for (const element of rest){
+        //for every subpoll send it and add the required reactions
+        const message = await interaction.followUp({embeds: [element[0]], ephemeral: eph, fetchReply: true})
+        //console.log(message)
+        if (eph) continue;
+        for (i = 0; i < element[1]; i++){
+            message.react(emojiLookup[i])
         }
+    }
 }
-module.exports = {PrintEmbeds, Poll}
+async function GetEmbedData(msg){
+    console.log(msg.embeds)
+    msg.embeds.forEach((embed) => {
+        fields = embed.fields;
+    })
+}
+module.exports = {PrintEmbeds, Poll, GetEmbedData}
