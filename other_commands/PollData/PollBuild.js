@@ -81,4 +81,22 @@ async function GetEmbedData(msg){
         fields = embed.fields;
     })
 }
-module.exports = {PrintEmbeds, Poll, GetEmbedData}
+function ChangeData(intercation, msg, data, object){
+    emb = msg.embeds[0]
+    oldData = emb[object];
+    user = intercation.user.id;
+    console.log("olddata " + oldData)
+    console.log("data = " + data.content)
+
+    switch(object){
+        case 'title':
+        case 'description':
+            emb[object] = data.content;
+            msg.edit({embeds: [emb]})
+            break;
+    }
+    return `User <@${user}> changed ${object} from message found here ${msg.url}\nfrom "${oldData}" to "${data.content}"`
+
+}
+
+module.exports = {PrintEmbeds, Poll, GetEmbedData, ChangeData}
