@@ -22,11 +22,23 @@ const commands = [];
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./other_commands').filter(file => file.endsWith('.js'));
 
+function addCommand(command){
+    commands.push(command.data.toJSON());
+    client.commands.set(command.data.name, command)
+}
+
 for (const file of commandFiles) {
     const command = require(`./other_commands/${file}`);
-    commands.push(command.data.toJSON());
-    client.commands.set(command.data.name, command);
+    if (Array.isArray(command)){
+        for (const subcom of command){
+            addCommand(subcom)
+        }
+    } else {
+        addCommand(command)
+    }
+    
 }
+console.log(commands);
 
 
 //setup Routes/rest
