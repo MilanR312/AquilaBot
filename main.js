@@ -2,10 +2,14 @@ const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v10');
 const Discord = require('discord.js');
 const fs = require('fs');
+const CryptoJS = require('crypto-js')
+const { MessageEmbed } = require('discord.js');
 
 const { permissions } = require('./data.js')
 
 const client = new Discord.Client({ intents: permissions });
+
+const { PrintEmbedsFromMessage} = require('./other_commands/PollData/PollBuild')
 
 //setup and get all dotenv data
 const dotenv = require('dotenv');
@@ -20,7 +24,10 @@ const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 //get all commands from files
 const commands = [];
 client.commands = new Discord.Collection();
-const commandFiles = fs.readdirSync('./other_commands').filter(file => file.endsWith('.js'));
+const commandFiles = fs.readdirSync('./other_commands').filter(file => file.endsWith(".js"));
+
+
+
 
 function addCommand(command){
     commands.push(command.data.toJSON());
@@ -38,7 +45,7 @@ for (const file of commandFiles) {
     }
     
 }
-console.log(commands);
+//console.log(commands);
 
 
 //setup Routes/rest
@@ -70,7 +77,44 @@ client.on('interactionCreate', async interaction => {
 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
 });
-
+client.on("messageCreate", (message) => {
+    if (message.author.bot) return false
+    if (!message.content.startsWith("Aquila")) return false
+    var chan = message.channel
+    data = message.content.slice(6)
+    message.delete();
+    chan.send("received a valid poll")
+    decr = CryptoJS.AES.decrypt(data, "cool")
+    pollObject = JSON.parse(decr.toString(CryptoJS.enc.Utf8))
+    console.log(pollObject)
+    const MainPoll = pollObject.main
+    polls = []
+    const MainPollEmbed = new MessageEmbed()
+        .setTitle(MainPoll.title)
+        .setDescription(MainPoll.description)
+    polls.push(MainPoll)
+    const children = pollObject.children
+    const OtherPolls = children.map((val => {
+        [index, value] = val
+        const answers = value.ansWers.map(((ell, index) => {
+            const obj = {
+                name : "default",
+                value : "default",
+                inline : true
+            }
+            obj.name = `${String.fromCharCode(index+65)})`
+            obj.value = ell;
+            return obj;
+        }))
+        const Subpoll = new MessageEmbed()
+            .setTitle(value.main.title)
+            .setDescription(value.main.description)
+            .setFields(answers)
+        return Subpoll
+    }))
+    polls.push(...OtherPolls)
+    PrintEmbedsFromMessage(chan, polls, false)
+})
 
 console.log("Bot is starting");
 client.login(TOKEN)

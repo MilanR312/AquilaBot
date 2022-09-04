@@ -60,7 +60,7 @@ class Poll {//uptime, amount of questions, answers per question, pinned?, ceator
         return this.out
     }
 }
-emojiLookup = ["🇦","🇧","🇨"]
+emojiLookup = ["🇦","🇧","🇨","🇩","🇪","🇫","🇬","🇭","🇮","🇯","🇰","🇱","🇲","🇳","🇴","🇵","🇶","🇷","🇸","🇹","🇺","🇻","🇼","🇽","🇾","🇿"]
 async function PrintEmbeds(interaction, data, eph){
     const [main, ...rest] = data;
     await interaction.reply({ embeds: [main], ephemeral: eph})
@@ -72,6 +72,20 @@ async function PrintEmbeds(interaction, data, eph){
         if (eph) continue;
         for (i = 0; i < element[1]; i++){
             message.react(emojiLookup[i])
+        }
+    }
+}
+async function PrintEmbedsFromMessage(channel, data, eph){
+    const [main, ...rest] = data;
+    await channel.send({ embeds: [main], ephemeral: eph})
+    for (const element of rest){
+        //for every subpoll send it and add the required reactions
+        const message = await channel.send({embeds: [element], ephemeral: eph, fetchReply: true})
+        console.log(element)
+        if (eph) continue;
+        for (i = 0; i < element.fields.length; i++){
+            console.log(`added reaction ${i}`)
+            await message.react(emojiLookup[i])
         }
     }
 }
@@ -99,4 +113,4 @@ function ChangeData(intercation, msg, data, object){
 
 }
 
-module.exports = {PrintEmbeds, Poll, GetEmbedData, ChangeData}
+module.exports = {PrintEmbeds, Poll, GetEmbedData, ChangeData, PrintEmbedsFromMessage}

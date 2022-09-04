@@ -5,6 +5,7 @@ async function senderMult(interaction, res){
     embed = new MessageEmbed()
         .setTitle("multiple options found")
         .setDescription("choose which user you wish to see the answer for")
+
     result = res.rows.map( async quer => {
         const data = await interaction.guild.members.fetch(quer.userid)
         return {name:data.user.username, value: "score = 0"}
@@ -43,10 +44,23 @@ async function senderSingle(interaction, res, channelB, messageIndex = 0){
     
     content = "empty"
     if (channelB){
-        content = (await interaction.channel.messages.fetch(data.messageid)).content
+        channel = await interaction.guild.channels.fetch(data.vak)
+        message = await channel.messages.fetch(data.messageid)
+        console.log(message)
+        content = message.content
         console.log(content)
+        console.log(message.attachments)
+        att = []
+        try{
+            for( const [key, value] of message.attachments){
+                att.push(value)
+            }
+        } catch (e) {
+            console.log(e)
+        }
+        console.log(att)
     }
-    return `Found an answer from user ${userName} with content\n"${content}"`
+    return {content: `Found an answer from user ${userName} with content\n"${content}"`, files: [...att]}
 }
 
 module.exports = {senderMult, senderSingle}
