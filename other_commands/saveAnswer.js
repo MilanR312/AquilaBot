@@ -135,12 +135,22 @@ module.exports = [{
         switch (subcommand){
             case 'save':
                 try {
+                    if (interaction.guild.id != "978251400872075315"){
+                        throw "Error"
+                    }
+                } catch(err){
+                    interaction.reply("this feature is only available in the main server for the moment\njoin the main server here https://discord.gg/ebjWC3tBsa")
+                    return
+                }
+                try {
                     await checkuser(pool,userId)
                 } catch (err) {
                     interaction.reply({content: err, ephemeral: true})
                     return
                 }
+                
 
+                
                 const filter = m => m.author.id === interaction.user.id;
                 await interaction.reply({ content: "reply to the message you wish to save", ephemeral: true, fetchReply: true})
                 try {

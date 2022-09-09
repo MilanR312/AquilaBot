@@ -47,18 +47,21 @@ for (const file of commandFiles) {
 }
 //console.log(commands);
 
+const global = true;
 
-//setup Routes/rest
+//setup Routes/rest for local or global server
 (async () => {
     try {
         await rest.put(
-            Routes.applicationGuildCommands(CLIENT_ID, TEST_GUILD_ID),
+            (global) ? Routes.applicationCommands(CLIENT_ID) : Routes.applicationGuildCommands(CLIENT_ID, TEST_GUILD_ID),
             { body: commands },
         );
     } catch (error) {
         console.error(error);
     }
 })();
+
+
 
 
 console.log("setup completed")
