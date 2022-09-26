@@ -27,7 +27,7 @@ client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./other_commands').filter(file => file.endsWith(".js"));
 
 
-
+console.log(commandFiles)
 
 function addCommand(command){
     commands.push(command.data.toJSON());
@@ -36,6 +36,7 @@ function addCommand(command){
 
 for (const file of commandFiles) {
     const command = require(`./other_commands/${file}`);
+    console.log(command)
     if (Array.isArray(command)){
         for (const subcom of command){
             addCommand(subcom)

@@ -2,13 +2,15 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed, Message } = require('discord.js');
 const dotenv = require('dotenv');
 const { Pool } = require('pg');
+const fs = require("fs");
 const { symbolName, InvalidatedProjectKind } = require('typescript');
 const {senderMult, senderSingle } = require('./saveData/answerGet')
 const {checkuser} = require('./saveData/DBChecks')
 
+const vakken = require("./saveData/vakken.json")
+
 dotenv.config();
 const User = process.env.PGUSER
-console.log(typeof User, User)
 const pool = new Pool({
     user: process.env.PGUSER,
     host: process.env.PGHOST,
@@ -20,30 +22,18 @@ pool.on('error', (err, client) => {
     console.error('error in backend', err)
     process.exit(-1)
 })
-var vakken = [
-    { name: 'logging', value: '992758684981669999' },
-    { name: 'general', value: '978251401698365442' },
-    { name: 'wiskunde-i', value: '1015961275173449763' },
-    { name: 'mechanica-i', value: '1015961303459827793' },
-    { name: 'elektriciteit', value: '1015961483634540605' },
-    { name: 'chemie', value: '1015961538932244550' },
-    { name: 'materialen', value: '1015961574726451230' },
-    { name: 'autocad', value: '1015961629478879313' },
-    { name: 'siemens NX', value: '1015961670885060648' },
-    { name: 'wiskunde-ii', value: '1015961777126785115' },
-    { name: 'mechanica-ii', value: '1015961829337485392' },
-    { name: 'electronica', value: '1015961858865385523' },
-    { name: 'fysica', value: '1015961887600554084' },
-    { name: 'informatica', value: '1015961960786964583' },
-    { name: 'dent', value: '1015962021960884275' }
-  ]
-pool.query(
+
+/*pool.query(
     "select naam as name, channelid as value from ugent.vakken;",
     ((err, res) => {
+        if (!res.rows) reject("no data found")
         vakken = res.rows
         console.log(vakken)
+        var vakJson = JSON.stringify(vakken);
+        fs.writeFile('./other_commands/saveData/vakken.json', vakJson, err =>console.log("wrote file"));
     })
-)
+)*/
+console.log(vakken);
 
 module.exports = [{
     data: new SlashCommandBuilder()
