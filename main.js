@@ -1,3 +1,4 @@
+#!/usr/bin/env
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v10');
 const Discord = require('discord.js');
