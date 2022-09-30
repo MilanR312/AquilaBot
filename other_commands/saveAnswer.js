@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed, Message } = require('discord.js');
+const { EmbedBuilder, Message } = require('discord.js');
 const dotenv = require('dotenv');
 const { Pool } = require('pg');
 const fs = require("fs");
@@ -7,7 +7,7 @@ const { symbolName, InvalidatedProjectKind } = require('typescript');
 const {senderMult, senderSingle } = require('./saveData/answerGet')
 const {checkuser} = require('./saveData/DBChecks')
 
-const vakken = require("./saveData/vakken.json")
+vakken = require("./saveData/vakken.json")
 
 dotenv.config();
 const User = process.env.PGUSER
@@ -33,7 +33,7 @@ pool.on('error', (err, client) => {
         fs.writeFile('./other_commands/saveData/vakken.json', vakJson, err =>console.log("wrote file"));
     })
 )*/
-console.log(vakken);
+//console.log(vakken);
 
 module.exports = [{
     data: new SlashCommandBuilder()
@@ -46,9 +46,7 @@ module.exports = [{
             .addStringOption(option => option.setName('vak')
                                             .setDescription('welk vak de oef over gaat')
                                             .setRequired(true)
-                                            .addChoices(
-                                                ...vakken
-                                            )
+                                            .setAutocomplete(true)
             )
             .addIntegerOption(option => option.setName('hoofdstuk')
                                             .setDescription('het hoofdstuk om op te slaan')
@@ -67,9 +65,7 @@ module.exports = [{
             .addStringOption(option => option.setName('vak')
                                             .setDescription('welk vak de oef over gaat')
                                             .setRequired(true)
-                                            .addChoices(
-                                                ...vakken
-                                            )
+                                            .setAutocomplete(true)
             )
             .addIntegerOption( option => option.setName('hoofdstuk')
                                             .setDescription('b')
@@ -96,9 +92,7 @@ module.exports = [{
             .addStringOption(option => option.setName('vak')
                                                 .setDescription('test')
                                                 .setRequired(false)
-                                                .addChoices(
-                                                    ...vakken
-                                                )
+                                                .setAutocomplete(true)
             )
             .addIntegerOption(option => option.setName('hoofdstuk')
                                                 .setDescription('b')
@@ -120,7 +114,12 @@ module.exports = [{
         const vak = interaction.options.getString('vak');
         const hoofdstuk = interaction.options.getInteger('hoofdstuk');
         const oef = interaction.options.getNumber('oef');
-        console.log(interaction.options.getMentionable('test'))
+
+        if (['save','get','list'].includes(subcommand) && !vakken.map(vak => vak.value).includes(vak)){
+            interaction.reply({content: "doesnt exist", ephemeral:true})
+            return
+        }
+
         console.log("vak = " + vak + "  hoofdstuk ==" + hoofdstuk + " oef == " + oef)
         switch (subcommand){
             case 'save':
@@ -201,12 +200,13 @@ module.exports = [{
                     username = user.username
                     UserIdToStat = user.id
                 }
+                console.log(username,UserIdToStat);
                 max = 0
                 pool.query(`
                 select count(*)
                 from ugent.answers
                 where userid = ${UserIdToStat}
-                `, (err, res) => max = res.rows[0].count)
+                `, (err, res) => max = res.rows[0].count) //bug here
                 pool.query(`
                 select count(*), uv.naam
                 from ugent.answers as ua
@@ -287,7 +287,7 @@ module.exports = [{
                 function getEmbed(obj, res){
                     console.log(obj);
                     console.log("here");
-                    embed = new MessageEmbed()
+                    embed = new EmbedBuilder()
                                     .setTitle(`${obj.title}`)
                                     .setDescription(`amount of answers`)
                     results = res.rows.map( data => {return {name: `${obj.loc} ${data.naam}`, value:`has a total of ${data.count} answers`}})

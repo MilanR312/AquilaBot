@@ -1,19 +1,20 @@
 #!/usr/bin/env
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v10');
-const Discord = require('discord.js');
+const {Client, GatewayIntentBits, Partials, Collection} = require('discord.js');
 const fs = require('fs');
 const CryptoJS = require('crypto-js')
 const { MessageEmbed } = require('discord.js');
 
-const { permissions } = require('./data.js')
+const permissions = [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages/*, GatewayIntentBits.GuildMessagesReactions*/]
 
-const client = new Discord.Client({ intents: permissions });
+const client = new Client({ intents: permissions });
 
 const { PrintEmbedsFromMessage} = require('./other_commands/PollData/PollBuild')
 
 //setup and get all dotenv data
 const dotenv = require('dotenv');
+const { filter } = require('./other_commands/saveAnswer');
 dotenv.config();
 const TOKEN = process.env['TOKEN'];
 const CLIENT_ID = process.env['BOT_ID']
@@ -24,7 +25,7 @@ const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
 //get all commands from files
 const commands = [];
-client.commands = new Discord.Collection();
+client.commands = new Collection();
 const commandFiles = fs.readdirSync('./other_commands').filter(file => file.endsWith(".js"));
 
 
@@ -49,7 +50,7 @@ for (const file of commandFiles) {
 }
 //console.log(commands);
 
-const global = true;
+const global = false;
 
 //setup Routes/rest for local or global server
 (async () => {
@@ -64,14 +65,24 @@ const global = true;
 })();
 
 
-
+vakken = require("./other_commands/saveData/vakken.json")
 
 console.log("setup completed")
+console.log(vakken)
 
 //interaction event loop
 client.on('interactionCreate', async interaction => {
-	if (!interaction.isCommand()) return;
-
+	if (interaction.isAutocomplete()) {
+        const focusedOption = interaction.options.getFocused(true);
+        var filtered = vakken.filter(choice => choice.name.startsWith(focusedOption.value))
+        if (filtered.length > 25) {
+            filtered = filtered.slice(0,25);
+        }
+        interaction.respond(filtered)
+        return
+    }
+    if (!interaction.isCommand()) return;
+    
 	const command = client.commands.get(interaction.commandName);
 	if (!command) return;
 
