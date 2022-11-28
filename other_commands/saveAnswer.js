@@ -42,7 +42,7 @@ module.exports = [{
         .addSubcommand( subcommand => 
             subcommand
             .setName('save')
-            .setDescription("test")
+            .setDescription("save an answer")
             .addStringOption(option => option.setName('vak')
                                             .setDescription('welk vak de oef over gaat')
                                             .setRequired(true)
@@ -61,7 +61,7 @@ module.exports = [{
         .addSubcommand( subcommand =>
             subcommand
             .setName('get')
-            .setDescription('temp')
+            .setDescription('get an answer for your question')
             .addStringOption(option => option.setName('vak')
                                             .setDescription('welk vak de oef over gaat')
                                             .setRequired(true)
@@ -79,7 +79,7 @@ module.exports = [{
         .addSubcommand( subcommand => 
             subcommand
             .setName('stats')
-            .setDescription('get stats of user')
+            .setDescription('get the answer stats of user')
             .addUserOption(option => option.setName('user')
                                             .setDescription('get stats of other user')
                                             .setRequired(false)
@@ -88,7 +88,7 @@ module.exports = [{
         .addSubcommand( subcommand => 
             subcommand
             .setName('list')
-            .setDescription('te')
+            .setDescription('get a list of all the saved answers')
             .addStringOption(option => option.setName('vak')
                                                 .setDescription('test')
                                                 .setRequired(false)

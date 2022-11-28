@@ -1,4 +1,4 @@
-const { MessageEmbed, Interaction, User } = require('discord.js');
+const { EmbedBuilder, Interaction, User } = require('discord.js');
 
 function checkUserInPoll(polls, interaction){
     const UserId = interaction.user.id;

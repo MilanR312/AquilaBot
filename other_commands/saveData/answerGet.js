@@ -1,8 +1,8 @@
-const { MessageEmbed, Interaction } = require('discord.js');
+const { EmbedBuilder, Interaction } = require('discord.js');
 
 
 async function senderMult(interaction, res){
-    embed = new MessageEmbed()
+    embed = new EmbedBuilder()
         .setTitle("multiple options found")
         .setDescription("choose which user you wish to see the answer for")
 
@@ -40,6 +40,7 @@ async function senderSingle(interaction, res, channelB, messageIndex = 0){
 
     const data = res.rows[messageIndex]
     console.log(data)
+    //fix this
     const userName = await interaction.guild.members.fetch(data.userid)
     
     content = "empty"

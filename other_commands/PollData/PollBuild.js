@@ -1,4 +1,4 @@
-const { MessageEmbed, Interaction } = require('discord.js');
+const { EmbedBuilder, Interaction } = require('discord.js');
 
 class SubPoll {
     constructor(Question, Answer){
@@ -20,7 +20,7 @@ class SubPoll {
         });
 
         //generate the embed
-        this.embed = new MessageEmbed()
+        this.embed = new EmbedBuilder()
             .setTitle(this.Question)
             .setColor('#0099ff')
             .setFields(this.Fields)
@@ -38,7 +38,7 @@ class Poll {//uptime, amount of questions, answers per question, pinned?, ceator
         this.Titel = Titel;
         this.Description = Description
         this.Questions = [];
-        this.mainPoll = new MessageEmbed()
+        this.mainPoll = new EmbedBuilder()
             .setColor('#0099ff')
             .setTitle(Titel.toString())
             .setDescription(Description.toString())
@@ -81,9 +81,9 @@ async function PrintEmbedsFromMessage(channel, data, eph){
     for (const element of rest){
         //for every subpoll send it and add the required reactions
         const message = await channel.send({embeds: [element], ephemeral: eph, fetchReply: true})
-        console.log(element)
+        console.log(element.data.fields)
         if (eph) continue;
-        for (i = 0; i < element.fields.length; i++){
+        for (i = 0; i < element.data.fields.length; i++){
             console.log(`added reaction ${i}`)
             await message.react(emojiLookup[i])
         }

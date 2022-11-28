@@ -4,9 +4,11 @@ const { Routes } = require('discord-api-types/v10');
 const {Client, GatewayIntentBits, Partials, Collection} = require('discord.js');
 const fs = require('fs');
 const CryptoJS = require('crypto-js')
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
-const permissions = [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages/*, GatewayIntentBits.GuildMessagesReactions*/]
+const permissions = [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages,GatewayIntentBits.MessageContent, GatewayIntentBits.DirectMessages,
+    GatewayIntentBits.DirectMessageTyping, GatewayIntentBits.GuildMessageReactions
+    /*, GatewayIntentBits.GuildMessagesReactions*/]
 
 const client = new Client({ intents: permissions });
 
@@ -94,18 +96,25 @@ client.on('interactionCreate', async interaction => {
 	}
 });
 client.on("messageCreate", (message) => {
+
+    //check if the author is not the bot and if it starts with
     if (message.author.bot) return false
     if (!message.content.startsWith("Aquila")) return false
+
+    //shorthand for the channel and delete the aquila part
     var chan = message.channel
     data = message.content.slice(6)
     message.delete();
-    chan.send("received a valid poll")
+
+    //get the poll and translate to object
+    //chan.send("received a valid poll")
     decr = CryptoJS.AES.decrypt(data, "cool")
     pollObject = JSON.parse(decr.toString(CryptoJS.enc.Utf8))
-    console.log(pollObject)
+    
+
     const MainPoll = pollObject.main
     polls = []
-    const MainPollEmbed = new MessageEmbed()
+    const MainPollEmbed = new EmbedBuilder()
         .setTitle(MainPoll.title)
         .setDescription(MainPoll.description)
     polls.push(MainPoll)
@@ -122,7 +131,7 @@ client.on("messageCreate", (message) => {
             obj.value = ell;
             return obj;
         }))
-        const Subpoll = new MessageEmbed()
+        const Subpoll = new EmbedBuilder()
             .setTitle(value.main.title)
             .setDescription(value.main.description)
             .setFields(answers)
