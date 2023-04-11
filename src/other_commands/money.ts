@@ -12,6 +12,7 @@ module.exports = [{
                                     .setRequired(false)
         ),
         async execute(interaction: ChatInputCommandInteraction){
+            console.log(`${interaction.user.username} bal`);
             const user = interaction.options.getUser('user', false) ?? interaction.user;
             
             const data = await dbs.pool.query(`
@@ -24,7 +25,7 @@ module.exports = [{
             //add a more personalized embed with possible /profile?
             const emb = new EmbedBuilder()
                                 .setTitle(`balance of ${user.username}`)
-                                .setFields({name: "money", value:money});
+                                .setFields({name: "money", value: `${money}`});
             interaction.reply({embeds: [emb] });
         }
 }, {
@@ -33,6 +34,7 @@ module.exports = [{
                 .setDescription("show baltop")
         ,
         async execute(interaction: ChatInputCommandInteraction){
+            console.log(`${interaction.user.username} baltop`);
             const data = await dbs.pool.query(`
                 select userid, "money"
                 from ugent.users

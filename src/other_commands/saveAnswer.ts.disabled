@@ -1,4 +1,4 @@
-import { SlashCommandBuilder , EmbedBuilder, Interaction, ChatInputCommandInteraction} from "discord.js";
+import { SlashCommandBuilder , EmbedBuilder, Interaction, ChatInputCommandInteraction, PermissionFlagsBits} from "discord.js";
 
 import {save} from "./saveAnswerSubCommands/save";
 import { get } from "./saveAnswerSubCommands/get";

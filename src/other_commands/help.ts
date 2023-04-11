@@ -6,6 +6,7 @@ module.exports = {
                 .setName("help")
                 .setDescription("helps you")
     , async execute(interaction: ChatInputCommandInteraction){
+        console.log(`${interaction.user.username} helpmenu`);
         let embeds:EmbedBuilder[] = [];
 
         //add colors per help page to help differentiate

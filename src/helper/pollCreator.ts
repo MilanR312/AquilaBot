@@ -13,16 +13,17 @@ async function PrintEmbedsFromMessage(message: Message<boolean>, polls:EmbedBuil
         if (!element.data.fields) continue;
         for (let i = 0; i < element.data.fields.length; i++){
             console.log(`added reaction ${i}`)
-            await message.react(emojiLookup[i])
+            await embedMessage.react(emojiLookup[i])
         }
     }
 }
+let isEmpty = (str:string) => str == "" ? "empty string idiot" : str;
 class mainData{
     title: string;
     description: string;
     constructor(pollobj: any){
-        this.title = pollobj.title;
-        this.description = pollobj.description;
+        this.title = isEmpty(pollobj.title);
+        this.description = isEmpty(pollobj.description);
     }
 }
 class poll{
@@ -37,30 +38,32 @@ class poll{
 }
 
 class pollOwner{
-    title:string;
-    description: string;
+    data: mainData;
     children:poll[];
     constructor(pollobj: any){
-        this.title = pollobj.main.title;
-        this.description = pollobj.main.description;
+        this.data = new mainData(pollobj.main);
         this.children = pollobj.children.map((v:any) => {
             //v is of type [index, child] should probabily remove the index
             return new poll(v[1]);
         });
     }
 
-    toEmbed() {
+    toEmbed(message: Message<boolean>) {
         let polls:EmbedBuilder[] = [];
 
         polls.push(new EmbedBuilder()
-            .setTitle(this.title)
-            .setDescription(this.description)
+            .setTitle(this.data.title)
+            .setDescription(this.data.description)
+            .setAuthor({
+                name: message.member?.nickname ?? message.author.username,
+                iconURL: message.author.avatarURL() ?? undefined
+            })
         );
         const otherPolls = this.children.map((child) => {
             const answers = child.answers.map((ell, index) => {
                 return {
                     name: `${String.fromCharCode(index+65)}`,
-                    value: `ell`,
+                    value: `${ell}`,
                     inline: true
                 };
             });
@@ -83,7 +86,7 @@ export async function createPoll(message: Message<boolean>){
     let decr = AES.decrypt(data, "cool");
     let pollObject = new pollOwner(JSON.parse(decr.toString(enc.Utf8)));
 
-    let polls = pollObject.toEmbed();
+    let polls = pollObject.toEmbed(message);
 
     PrintEmbedsFromMessage(message, polls);
     

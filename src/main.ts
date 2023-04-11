@@ -1,6 +1,6 @@
 #!/user/bin/env
 
-import { REST, Routes , Collection, EmbedBuilder, Client, GatewayIntentBits, ChatInputCommandInteraction, AutocompleteInteraction, ApplicationCommand} from "discord.js";
+import { REST, Routes , Collection, EmbedBuilder, Client, GatewayIntentBits, ChatInputCommandInteraction, AutocompleteInteraction, ApplicationCommand, ActivityType} from "discord.js";
 import * as fs from 'fs';
 import * as CryptoTs from 'crypto-ts';
 
@@ -82,27 +82,31 @@ class vakInfo{
 };
 
 let vakken:vakInfo[] = [];
-async function updateVakken(interaction: AutocompleteInteraction){
+import { setInterval } from "timers";
+async function updateVakken() {
     const query = `
     SELECT channelid, save
     FROM ugent.vakken;
     `
     const result = await pool.query(query);
     let vakken2:vakInfo[] = [];
+    const server = await client.guilds.fetch("978251400872075315");
     for (let v of result.rows){
-        const vak = await interaction.guild?.channels.fetch(v.channelid);
+        const vak = await server.channels.fetch(v.channelid);
         if (vak == null) continue;
         vakken2.push(new vakInfo(vak.name, v.channelid));
     }
     vakken = vakken2;
-    console.log(vakken);
+    console.log(vakken);  
 }
+updateVakken();
+setInterval(updateVakken, 1000*60*60);
+//update every hour
+
 
 
 client.on('interactionCreate',async interaction => {
     if (interaction.isAutocomplete()){
-        await updateVakken(interaction);
-        console.log("setting autocomplete");
         const focussedOption = interaction.options.getFocused(true);
         
         var filteredData = vakken.filter((choice:any) => choice.name.startsWith(focussedOption.value));
@@ -116,7 +120,6 @@ client.on('interactionCreate',async interaction => {
     if (!interaction.isCommand()) return;
 
     let isTester = env.TESTERS.split(" ").includes(interaction.user.id);
-    console.log(`isTester == ${isTester}`);
     if (DEBUG && !isTester) {
         //quick return for debug testing
         await interaction.reply({content: "DEBUG mode is turned on and commands are restricted"});
@@ -125,6 +128,7 @@ client.on('interactionCreate',async interaction => {
 
     const command = client.slashCommands.get(interaction.commandName);
     if (!command) return;
+    console.log(`${interaction.user.username} + ${interaction.commandName}`);
 
     try {
         await command.execute(interaction);
@@ -135,22 +139,42 @@ client.on('interactionCreate',async interaction => {
 });
 
 import {createPoll} from "./helper/pollCreator";
+let i = 1;
 client.on("messageCreate", async (message) => {
-
-    if (message.content.includes("@MilanR#7824 ")){
-        message.member?.timeout(60);
-    }
-
     if (message.author.bot) return;
     if (!message.content.startsWith("Aquila")) return;
-
+    if (message.author.id == "340776926912446464"){
+        message.channel.send("get trolled");
+        message.member?.timeout(i*60*1000); //1 minute mute funny
+        console.log("trolled");
+        i++;
+        message.delete();
+        return;
+    }
     await createPoll(message);
-})
+});
 
-client.on("ready", async (stream) => {
-    let chan:any = await client.channels.cache.get("1015961960786964583")
-    chan.send("<@615636564692828163>");
-})
-
+client.once("ready", async (stream) => {
+    if (DEBUG) {
+        client.user?.setPresence({
+            status:"online",
+            activities: [
+                {
+                    name: "DEBUG"
+                }
+            ]
+        })
+    } else {
+        client.user?.setPresence({
+            status: "online",
+            activities: [
+            {
+                name: "/help",
+                type: ActivityType.Competing
+            }]
+        })
+    }
+    
+});
 console.log("bot is starting");
 client.login(env.TOKEN);

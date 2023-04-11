@@ -1,0 +1,26 @@
+import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { syncBuiltinESMExports } from "module";
+import { role , roleDetails} from "./buySubCommands/role";
+
+module.exports = {
+    data: new SlashCommandBuilder()
+                .setName("buy")
+                .setDescription("buy something")
+                .addSubcommand(subcommand => 
+                        subcommand.setName("role")
+                                .setDescription("buy a role")
+                                .addRoleOption(option => 
+                                    option.setName("rolename")
+                                            .setDescription("the role you wish to buy")
+                                    )
+                    ),
+    async execute(interaction: ChatInputCommandInteraction) {
+        const thingToBuy = interaction.options.getSubcommand();
+        switch (thingToBuy) {
+            case "role":
+                if(interaction.options.getRole("rolename") == null)
+                    return await roleDetails(interaction);
+                return await role(interaction);
+        }
+    }
+}
