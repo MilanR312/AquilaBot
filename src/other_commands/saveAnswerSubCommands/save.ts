@@ -1,4 +1,4 @@
-import { channelMention, ChatInputCommandInteraction, disableValidators, Message } from "discord.js";
+import { channelMention, ChatInputCommandInteraction, disableValidators, EmbedBuilder, Message } from "discord.js";
 import * as dbs from "./../../dbs/dbs";
 
 
@@ -25,7 +25,7 @@ export async function save(interaction: ChatInputCommandInteraction) {
         return;
     }
     if (! await checkChannel(interaction)){
-        interaction.reply({content: "saving answrs is not allowed in this channel"});
+        interaction.reply({content: "saving answers is not allowed in this channel"});
         return;
     }
 
@@ -67,6 +67,25 @@ export async function save(interaction: ChatInputCommandInteraction) {
                 SET "money"="money"+2
                 WHERE userid=${message.author.id} or userid=${interaction.user.id};   
             `);
+            
+            const logChannel = await interaction.guild.channels.fetch("1095977898508296262");
+            if (!logChannel || !logChannel.isTextBased()) return;
+            let embed = new EmbedBuilder()
+                                .setColor(0x00FF00)
+                                .setTitle("save")
+                                .setDescription(`<@${interaction.user.id}> saved a message from <@${message.author.id}>`)
+                                .setFields({
+                                    name: "channelid",
+                                    value: `${channelId}`
+                                },{
+                                    name: "messageid",
+                                    value: `${messageId}`
+                                }, {
+                                    name: "content",
+                                    value: message.content
+                                });
+            logChannel.send({embeds:[embed], files: [...message.attachments.values()]});
+
         } catch (err) {
             interaction.followUp("message has already been saved");
         }

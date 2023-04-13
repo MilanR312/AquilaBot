@@ -10,11 +10,11 @@ module.exports = {
         subcommand
         .setName('save')
         .setDescription("save an answer")
-        .addStringOption(option => option.setName('vak')
+        /*.addStringOption(option => option.setName('vak')
                                         .setDescription('welk vak de oef over gaat')
                                         .setRequired(true)
                                         .setAutocomplete(true)
-        )
+        )*/
         .addIntegerOption(option => option.setName('hoofdstuk')
                                         .setDescription('het hoofdstuk om op te slaan')
                                         .setRequired(true)

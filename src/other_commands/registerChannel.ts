@@ -29,7 +29,7 @@ module.exports = {
                 };
 
                 result = await pool.query(query);
-                const message = `user ${interaction.user.username} set channel answer saving to ${saveAnswerPerms}`
+                const message = `user <@${interaction.user.id}> set channel ${interaction.channelId} answer saving to ${saveAnswerPerms}`
                 interaction.reply(message);
                 let channel = await interaction.guild?.channels.fetch("1095036258432073818")
                 if (!channel?.isTextBased()) return;

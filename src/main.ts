@@ -86,7 +86,8 @@ import { setInterval } from "timers";
 async function updateVakken() {
     const query = `
     SELECT channelid, save
-    FROM ugent.vakken;
+    FROM ugent.vakken
+    where save=true;
     `
     const result = await pool.query(query);
     let vakken2:vakInfo[] = [];
