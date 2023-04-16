@@ -6,12 +6,12 @@ import {getAnswerMessages, getAnswerMessage} from "./../../helper/message";
 export async function get(interaction: ChatInputCommandInteraction){
     
     const vak = interaction.options.getString("vak", true);
-    const hoofdstuk = interaction.options.getInteger('hoofdstuk');
-    const oef = interaction.options.getNumber('oef');
+    const hoofdstuk = interaction.options.getString('hoofdstuk');
+    const oef = interaction.options.getString('oef');
     const result = await dbs.pool.query(`
         SELECT * FROM ugent.answers ans
         inner join ugent.users us using(userid)
-        where ans.vak = ${vak} and ans.chapter = ${hoofdstuk} and ans.oef = ${oef}
+        where ans.vak = ${vak} and ans.chapter = '${hoofdstuk}' and ans.oef = '${oef}'
         ORDER BY us."money" DESC LIMIT 10`);
     switch (result.rowCount){
         case 0:

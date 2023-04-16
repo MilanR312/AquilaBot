@@ -28,20 +28,47 @@ export async function save(interaction: ChatInputCommandInteraction) {
         interaction.reply({content: "saving answers is not allowed in this channel"});
         return;
     }
+    let hoofdstuk = interaction.options.getString('hoofdstuk');
+    let oef = interaction.options.getString('oef');
+    if(!hoofdstuk || ! oef) throw "err";
+
+
+    //check the inputs
+    let hoofdstukCheck = /^(?:\d+|examen)$/gi;
+    if(!hoofdstukCheck.exec(hoofdstuk)){
+        interaction.reply(`hoofdstuk niet van vorm ${hoofdstukCheck}
+        vb van correcte vorm zijn (1, 25, examen)`);
+        return;
+    }
+    
+    let oefCheck = /^(?:\d+(?:(?:(?:\.|,)\d+|\w))*|samenvatting)$/gi
+    if(!oefCheck.exec(oef)){
+        interaction.reply(`oefening niet van vorm ${oefCheck}
+        vb  van correcte vorm van oef zijn (2e, 5.1, 5.2.1, 8.6e, samenvatting)`);
+        return;
+    }
+    oef = oef.replace(",",".");
+
 
     const filter = (m:any) => m.author.id === interaction.user.id;
     await interaction.reply({ content: "reply to the message you wish to save", ephemeral: true, fetchReply: true})
+    
+    
+    
     try {
+        //haal de eerste reply op
         let collected = await interaction.channel?.awaitMessages({filter, max: 1, time: 30000, errors: ['time']});
         if (collected == undefined) throw "err";
         let data = collected.first();
         if (data == undefined || data.reference == undefined) throw "err";
 
+        //krijg channelid en messageid van de referenced data
         const channelId = data.reference.channelId;
         const messageId = data.reference.messageId;
 
         const channel = await data.guild?.channels.cache.get(channelId);
         if (channel == undefined) throw "err";
+        data.delete();
 
         if (!channel.isTextBased()) throw "err";
 
@@ -52,19 +79,21 @@ export async function save(interaction: ChatInputCommandInteraction) {
         await dbs.checkUser(message.author.id, "check");
         
 
-        const hoofdstuk = interaction.options.getInteger('hoofdstuk');
-        const oef = interaction.options.getNumber('oef');
+        
 
         try {
-            let result = await dbs.pool.query(`
-                insert into ugent.answers (userid, messageid, vak, chapter, oef)
-                values (${message.author.id},${messageId}, ${channelId},${hoofdstuk},${oef});
-            `);
+            const query = `
+            insert into ugent.answers (userid, messageid, vak, chapter, oef)
+            values (${message.author.id},${messageId}, ${channelId},'${hoofdstuk}','${oef}');
+            `;
+            let result = await dbs.pool.query(query);
             interaction.followUp("succesfully saved");
             //give the user who made the answer +2 and the user who saved the answer +2
+            let earned = 2;
+            if (message.author.id == interaction.user.id) earned = 4;
             await dbs.pool.query(`
                 UPDATE ugent.users
-                SET "money"="money"+2
+                SET "money"="money"+${earned}
                 WHERE userid=${message.author.id} or userid=${interaction.user.id};   
             `);
             
@@ -82,11 +111,12 @@ export async function save(interaction: ChatInputCommandInteraction) {
                                     value: `${messageId}`
                                 }, {
                                     name: "content",
-                                    value: message.content
+                                    value: (message.content.length == 0) ? " " : message.content
                                 });
             logChannel.send({embeds:[embed], files: [...message.attachments.values()]});
 
         } catch (err) {
+            console.log(err);
             interaction.followUp("message has already been saved");
         }
 

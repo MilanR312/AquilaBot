@@ -1,7 +1,10 @@
-import { SlashCommandBuilder , EmbedBuilder, Interaction, ChatInputCommandInteraction, PermissionFlagsBits} from "discord.js";
+import { SlashCommandBuilder , EmbedBuilder, Interaction, ChatInputCommandInteraction, PermissionFlagsBits, AutocompleteInteraction, CacheType} from "discord.js";
 
 import {save} from "./saveAnswerSubCommands/save";
 import { get } from "./saveAnswerSubCommands/get";
+
+
+
 module.exports = {
     data: new SlashCommandBuilder()
     .setName('answer')
@@ -15,14 +18,16 @@ module.exports = {
                                         .setRequired(true)
                                         .setAutocomplete(true)
         )*/
-        .addIntegerOption(option => option.setName('hoofdstuk')
+        .addStringOption(option => option.setName('hoofdstuk')
                                         .setDescription('het hoofdstuk om op te slaan')
                                         .setRequired(true)
+                                        //.setAutocomplete(true)
         
         )
-        .addNumberOption(option => option.setName('oef')
+        .addStringOption(option => option.setName('oef')
                                         .setDescription('oefening')
                                         .setRequired(true)
+                                        //.setAutocomplete(true)
         )
     )
     .addSubcommand( subcommand =>
@@ -34,15 +39,17 @@ module.exports = {
                                         .setRequired(true)
                                         .setAutocomplete(true)
         )
-        .addIntegerOption( option => option.setName('hoofdstuk')
+        .addStringOption( option => option.setName('hoofdstuk')
                                         .setDescription('b')
                                         .setRequired(true)
+                                        //.setAutocomplete(true)
         )
-        .addNumberOption( option => option.setName('oef')
+        .addStringOption( option => option.setName('oef')
                                         .setDescription('c')
                                         .setRequired(true)
+                                        //.setAutocomplete(true)
         )
-    )
+    )/*
     .addSubcommand( subcommand => 
         subcommand
         .setName('stats')
@@ -73,7 +80,7 @@ module.exports = {
                                                 .setDescription('d')
                                                 .setRequired(false)
         )
-    )
+    )*/
     ,
     async execute(interaction: ChatInputCommandInteraction) {
         const subcommand = interaction.options.getSubcommand();

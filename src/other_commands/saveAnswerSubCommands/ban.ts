@@ -14,7 +14,7 @@ export async function ban(interaction: ChatInputCommandInteraction){
     on conflict(userid) do
     	update set banned = true;
     `
-    interaction.deferReply();
+    interaction.reply("banned user");
     await dbs.pool.query(query);
     if (!user.dmChannel)
         await user.createDM()
@@ -22,5 +22,4 @@ export async function ban(interaction: ChatInputCommandInteraction){
     const channel = await interaction.guild?.channels.fetch("1095036258432073818")
     if (!channel || !channel.isTextBased()) return;
     channel.send(`${interaction.user.username} banned ${user.username}`);
-    interaction.editReply("banned user");
 }

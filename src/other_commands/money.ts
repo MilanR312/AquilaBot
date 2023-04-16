@@ -34,10 +34,10 @@ module.exports = [{
                 .setDescription("show baltop")
         ,
         async execute(interaction: ChatInputCommandInteraction){
-            console.log(`${interaction.user.username} baltop`);
             const data = await dbs.pool.query(`
                 select userid, "money"
                 from ugent.users
+                where userid!=968232622402711582
                 order by "money" desc
                 limit 20;
             `);
@@ -45,10 +45,12 @@ module.exports = [{
             let emb = new EmbedBuilder()
                         .setTitle("baltop")
             console.log(data.rowCount);
-            data.rows.forEach(async (row) => {
+            for(let row of data.rows.values()){
                 const user = await interaction.guild?.members.fetch(row.userid);
-                emb.addFields({name: user?.user.username ?? "deleted", value: row.money});
-            })
+                let name = user?.nickname;
+                if (!name) name = user?.user.username;
+                emb.addFields({name: name ?? "deleted", value: row.money});
+            }
             interaction.reply({embeds: [emb]});
         }
 }

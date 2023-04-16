@@ -28,9 +28,9 @@ module.exports = {
                 const subCommand = interaction.options.getSubcommand();
                 switch (subCommand){
                     case 'ban':
-                        await ban(interaction);
+                        return await ban(interaction);
                     case 'delete':
-                        await deleteAnswer(interaction);
+                        return await deleteAnswer(interaction);
                 }
             }
 }

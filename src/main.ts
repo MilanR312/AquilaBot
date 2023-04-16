@@ -61,61 +61,32 @@ const global = false;
 
 (async () => {
     try {
+        let globalCommands:SlashCommand[] = (global) ? commands : [];
+        let localCommands:SlashCommand[] = (!global) ? commands: [];
+        
         await rest.put(
-            (global) 
-                ? Routes.applicationCommands(env.BOT_ID)
-                : Routes.applicationGuildCommands(env.BOT_ID, env.TEST_GUILD_ID),
-            {body: commands},
+            Routes.applicationCommands(env.BOT_ID),
+            {body: globalCommands}
             );
+        await rest.put(
+            Routes.applicationGuildCommands(env.BOT_ID, env.TEST_GUILD_ID),
+            {body: localCommands}
+        );
     } catch (error){
         console.log(error)
     }
 })();
 
-class vakInfo{
-    name:string;
-    value: string;
-    constructor(name: string, val : string){
-        this.name = name;
-        this.value = val;
-    }
-};
 
-let vakken:vakInfo[] = [];
-import { setInterval } from "timers";
-async function updateVakken() {
-    const query = `
-    SELECT channelid, save
-    FROM ugent.vakken
-    where save=true;
-    `
-    const result = await pool.query(query);
-    let vakken2:vakInfo[] = [];
-    const server = await client.guilds.fetch("978251400872075315");
-    for (let v of result.rows){
-        const vak = await server.channels.fetch(v.channelid);
-        if (vak == null) continue;
-        vakken2.push(new vakInfo(vak.name, v.channelid));
-    }
-    vakken = vakken2;
-    console.log(vakken);  
-}
-updateVakken();
-setInterval(updateVakken, 1000*60*60);
-//update every hour
-
-
-
+import { answerAutocomplete } from "./other_commands/saveAnswerSubCommands/autocomplete";
 client.on('interactionCreate',async interaction => {
     if (interaction.isAutocomplete()){
-        const focussedOption = interaction.options.getFocused(true);
-        
-        var filteredData = vakken.filter((choice:any) => choice.name.startsWith(focussedOption.value));
-        let filtered = filteredData.map((val) => ({name: val.name, value: val.value}));
-        if (filtered.length > 25) {
-            filtered = filtered.slice(0,25);
+        const subCommand = interaction.commandName;
+        switch (subCommand){
+            case 'answer': 
+                await answerAutocomplete(interaction);
+            break
         }
-        interaction.respond(filtered);
         return;
     }
     if (!interaction.isCommand()) return;

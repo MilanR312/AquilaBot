@@ -34,8 +34,8 @@ module.exports = {
                 
                 when saving add following options
                 vak: (kanaalNaam / autocomplete)
-                hoofdstuk (integer, 0,1,2 enz)
-                oef (decimaal, 1 cijfer na comma, 0.1, 5.3 enz)
+                hoofdstuk (1, 25, examen)
+                oef (2e, 5.1, 5.2.1, 8.6e, samenvatting)
                 `})
             .addFields({name:"/answer get", value:`allows the user to get an answer, provide the same options as mentiont at /answer save`})
             .addFields({name:"/answer list", value:"show how many answer a specific vak/hoofdstuk/oefening has based on the amount of input parameters !undergoing rewrite!"})
@@ -44,7 +44,7 @@ module.exports = {
         //poll help
         embeds.push(new EmbedBuilder()
             .setTitle("poll")
-            .addFields({name: "polls", value:`the creation of polls is possible at https://milanr312.github.io/ all fields are required (to be changed)
+            .addFields({name: "polls", value:`the creation of polls is possible at https://milanr312.github.io/
                 to post the poll in discord click get the string to copy the poll to clipboard, then paste it in the channel where you want it
             `})
         )
