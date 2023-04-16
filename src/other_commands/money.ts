@@ -45,12 +45,17 @@ module.exports = [{
             let emb = new EmbedBuilder()
                         .setTitle("baltop")
             console.log(data.rowCount);
-            for(let row of data.rows.values()){
-                const user = await interaction.guild?.members.fetch(row.userid);
-                let name = user?.nickname;
-                if (!name) name = user?.user.username;
-                emb.addFields({name: name ?? "deleted", value: row.money});
-            }
+            const moneyList = data.rows.map(row => ({id: row.userid, money: row.money}));
+            const userList = await interaction.guild?.members.fetch({user: moneyList.map((row) => row.id)});
+
+            const fields = moneyList.map((row) => {
+                let member = userList?.get(row.id);
+                if (member == undefined) return {name: "deleted", value: row.money};
+                let name = member.nickname;
+                if (!name) name = member.user.username;
+                return {name: name ?? "deleted", value: row.money}
+            });
+            emb.addFields(fields);
             interaction.reply({embeds: [emb]});
         }
 }
