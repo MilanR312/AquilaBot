@@ -126,7 +126,33 @@ client.on("messageCreate", async (message) => {
     await createPoll(message);
 });
 
+let anoyingUsers = ["324475079251460097", "283661820332474368", "892060831943123054"];
+let allowedChanels = ["978251401698365442","1017737754983010315", "1082378023891898378","1082270207877328966"];
+function get_random (list: any[]) {
+    return list[Math.floor((Math.random()*list.length))];
+}
+
+let lol = async () => {
+    let chan = get_random(allowedChanels);
+    let channel = await client.channels.fetch(chan);
+    if (channel == null || !channel.isTextBased()) return;
+    let userToPing = get_random(anoyingUsers);
+
+    let mess = await channel.send(`<@${userToPing}>`);
+    mess.delete();
+    
+    let channel2 = await client.channels.fetch("1095036258432073818"); //logging
+    if (channel2 == null || !channel2.isTextBased()){
+	console.log("err");
+	return;
+    }
+    channel2.send(`ping user <@${userToPing}> in channel <#${chan}> :)`);
+}
+
+
 client.once("ready", async (stream) => {
+    //lol();
+    setTimeout(lol, 1000 * 60 * 60 * 6);
     if (DEBUG) {
         client.user?.setPresence({
             status:"online",

@@ -38,7 +38,7 @@ let lastTimeUpdated = new Date("2023-04-15T11:00");
 
 export async function answerAutocomplete(interaction: AutocompleteInteraction<CacheType>){
     console.log((new Date()).getHours() - lastTimeUpdated.getHours());
-    if((new Date()).getHours() - lastTimeUpdated.getHours() >= 1){ //update every hour
+    if(new Date().getTime() - lastTimeUpdated.getTime() > 60*60*1000){ //update every hour
         lastTimeUpdated = new Date();
         console.log("updating vakken");
         await updateVakken(interaction);
