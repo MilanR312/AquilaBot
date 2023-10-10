@@ -63,6 +63,19 @@ class dbs {
         if(!result) throw "error getting user";
         return result.rows[0];
     }
+
+    async deleteUser(userid:string) {
+        let result = await this.pool.query(`DELETE from ugent.users where userid = ${userid}`);
+        
+        if(!result) throw "error deleting user";
+    }
+
+    async getMessage(messageId:string) {
+        let result = await this.pool.query(`SELECT * from ugent.answers where messageid = ${messageId}`);
+        
+        if(!result) throw "error getting message";
+        return result.rows[0];
+    }
 }
 
 export { dbs }

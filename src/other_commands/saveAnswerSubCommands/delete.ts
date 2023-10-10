@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, EmbedBuilder, GuildBasedChannel } from "discord.js";
-import { pool } from "./../../dbs/dbs";
+import { dbs } from "./../../dbs/dbs";
 
 
 export async function deleteAnswer(interaction: ChatInputCommandInteraction){
