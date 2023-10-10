@@ -56,6 +56,13 @@ class dbs {
     
         return true;
     }
+
+    async getUser(userid:string) {
+        let result = await this.pool.query('SELECT * from ugent.users where userid = ${userid}');
+        
+        if(!result) throw "error getting user";
+        return result.rows[0];
+    }
 }
 
 export { dbs }
