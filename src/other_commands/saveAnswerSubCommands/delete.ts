@@ -33,8 +33,6 @@ export async function deleteAnswer(interaction: ChatInputCommandInteraction){
                 if (field.name == "channelid") channelId = field.value;
                 if (field.name == "messageid") messageId = field.value;
             }
-            channel = await interaction.guild?.channels.fetch(channelId);
-            if (!channel?.isTextBased()) throw "error retrieving channel";
         }
         if(!channelId || !messageId) throw "empty id";
         let query = `
@@ -44,6 +42,8 @@ export async function deleteAnswer(interaction: ChatInputCommandInteraction){
         const message = await channel.messages.fetch(messageId);
         let reqult = await pool.query(query);
         interaction.followUp("succesfully deleted answer");
+
+        
         console.log(reqult);
         const debugchannel = await interaction.guild?.channels.fetch("1095977898508296262");
         if (!debugchannel?.isTextBased()) return;
