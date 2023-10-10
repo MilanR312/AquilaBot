@@ -76,6 +76,7 @@ class dbs {
         if(!result) throw "error getting message";
         return result.rows[0];
     }
+
 }
 
 export { dbs }

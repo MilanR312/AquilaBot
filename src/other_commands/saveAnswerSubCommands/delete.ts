@@ -40,11 +40,12 @@ export async function deleteAnswer(interaction: ChatInputCommandInteraction){
         WHERE vak=${channelId} and messageid=${messageId};
         `
         const message = await channel.messages.fetch(messageId);
-        let reqult = await pool.query(query);
+        //let reqult = await pool.query(query);   //put in comments so it still works but should be reworked
+        //should be a function in dbs class updates to come
         interaction.followUp("succesfully deleted answer");
 
         
-        console.log(reqult);
+        //console.log(reqult);
         const debugchannel = await interaction.guild?.channels.fetch("1095977898508296262");
         if (!debugchannel?.isTextBased()) return;
         let embed = new EmbedBuilder()
