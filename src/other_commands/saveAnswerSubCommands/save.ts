@@ -19,15 +19,6 @@ export async function save(interaction: ChatInputCommandInteraction) {
         return
     }
 
-    let allowed = await dbs.checkUser(interaction.user.id, "save");
-    if (!allowed) {
-        interaction.reply({content: "You have been banned from using this feature", ephemeral:true});
-        return;
-    }
-    if (! await checkChannel(interaction)){
-        interaction.reply({content: "saving answers is not allowed in this channel"});
-        return;
-    }
     let hoofdstuk = interaction.options.getString('hoofdstuk');
     let oef = interaction.options.getString('oef');
     if(!hoofdstuk || ! oef) throw "err";
@@ -48,6 +39,16 @@ export async function save(interaction: ChatInputCommandInteraction) {
         return;
     }
     oef = oef.replace(",",".");
+
+    let allowed = await dbs.checkUser(interaction.user.id, "save");
+    if (!allowed) {
+        interaction.reply({content: "You have been banned from using this feature", ephemeral:true});
+        return;
+    }
+    if (! await checkChannel(interaction)){
+        interaction.reply({content: "saving answers is not allowed in this channel"});
+        return;
+    }
 
 
     const filter = (m:any) => m.author.id === interaction.user.id;
@@ -98,14 +99,15 @@ export async function save(interaction: ChatInputCommandInteraction) {
             `);
             
             const logChannel = await interaction.guild.channels.fetch("1095977898508296262");
+            const ogchannel = await interaction.guild.channels.fetch(channelId);
             if (!logChannel || !logChannel.isTextBased()) return;
             let embed = new EmbedBuilder()
                                 .setColor(0x00FF00)
                                 .setTitle("save")
-                                .setDescription(`<@${interaction.user.id}> saved a message from <@${message.author.id}>`)
+                                .setDescription(`${interaction.user.username} saved a message from ${message.author.username}`)
                                 .setFields({
                                     name: "channelid",
-                                    value: `${channelId}`
+                                    value: `<#${channelId}>`
                                 },{
                                     name: "messageid",
                                     value: `${messageId}`

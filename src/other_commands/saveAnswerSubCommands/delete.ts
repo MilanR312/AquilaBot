@@ -43,6 +43,7 @@ export async function deleteAnswer(interaction: ChatInputCommandInteraction){
         `
         const message = await channel.messages.fetch(messageId);
         let reqult = await pool.query(query);
+        interaction.followUp("succesfully deleted answer");
         console.log(reqult);
         const debugchannel = await interaction.guild?.channels.fetch("1095977898508296262");
         if (!debugchannel?.isTextBased()) return;
