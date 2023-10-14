@@ -21,6 +21,7 @@
     "crypto-ts": "^1.0.2",
     "discord.js": "^14.8.0",
     "pg": "^8.10.0",
+    "pg-error-enum": "^0.7.0",
     "ts-dotenv": "^0.9.1"
   },
   "devDependencies": {

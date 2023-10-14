@@ -257,6 +257,11 @@ pg-connection-string@^2.5.0:
   resolved "https://registry.npmjs.org/pg-connection-string/-/pg-connection-string-2.5.0.tgz"
   integrity sha512-r5o/V/ORTA6TmUnyWZR9nCj1klXCO2CEKNRlVuJptZe85QuhFayC7WeMic7ndayT5IRIR0S0xFxFi2ousartlQ==
 
+pg-error-enum@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.npmjs.org/pg-error-enum/-/pg-error-enum-0.7.0.tgz"
+  integrity sha512-8/Xhu/t3JXub9LXDOKUnysaJtVYZVTRGLpHE0Bv2+o9yY2laXIkdngMJ8n0yUiIbT8JK+dY3WM5liN1lOwsuPg==
+
 pg-int8@1.0.1:
   version "1.0.1"
   resolved "https://registry.npmjs.org/pg-int8/-/pg-int8-1.0.1.tgz"
