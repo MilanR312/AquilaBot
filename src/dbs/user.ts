@@ -47,6 +47,7 @@ export class DbsUser{
             WHERE userid=${this.userid};
             `
         );
+        this._banned = banned;
         //if there was an error set the type to be out of sync
         if (result.isErr()){
             this.inSync = false;
@@ -62,7 +63,7 @@ export class DbsUser{
             WHERE userid=${this.userid};  
             `
         );
-
+        this._money += earned;
         if (result.isErr()){
             this.inSync = false;
         }
