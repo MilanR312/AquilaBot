@@ -54,16 +54,25 @@ export class DbsUser{
         }
         return result.map((val) => {});
     } 
-    async addMoney(earned: number): Promise<Result<void, number>>{
+    async changeMoney(earned: number): Promise<Result<void, number>>{
         let conn = dbs.getInstance();
-        let result = await conn.query(
-            `
+        let query;
+        if (earned < 0 ) {
+            earned = earned *-1 //if negative then change positive and put - for query
+            query =         `
             UPDATE ugent.users
-            SET "money"="money"+${earned}
+            SET "money"="money"-${earned}
             WHERE userid=${this.userid};  
             `
-        );
-        this._money += earned;
+        }else {
+          query =         `
+            UPDATE ugent.users
+            SET "money"="money"-${earned}
+            WHERE userid=${this.userid};  
+            `
+        }
+        let result = await conn.query(query);
+        this._money += earned; //can stay since += does work with negative numbers
         if (result.isErr()){
             this.inSync = false;
         }
