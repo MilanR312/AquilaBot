@@ -1,7 +1,8 @@
 import { Result } from "./../types/result/result";
 import { PostgresError } from 'pg-error-enum';
 import { dbs } from "./dbs";
-export class DbsUser{
+import {IUser} from "../interfaces/IUser";
+export class DbsUser implements IUser{
     private _banned: boolean;
     private _money: number;
     private readonly userid: string;
