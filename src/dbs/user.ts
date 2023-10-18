@@ -21,7 +21,7 @@ export class DbsUser{
      * returns if the user instance is in sync with the database 
      * */    
     public get inSync() : boolean {
-        return this.inSync;
+        return this.in_sync;
     }
     private set inSync(newval: boolean){
         this.in_sync = newval;
@@ -52,7 +52,7 @@ export class DbsUser{
         if (result.isErr()){
             this.inSync = false;
         }
-        return result.map((val) => {});
+        return result.map((_) => {});
     } 
     async changeMoney(earned: number): Promise<Result<void, number>>{
         let conn = dbs.getInstance();
@@ -76,7 +76,7 @@ export class DbsUser{
         if (result.isErr()){
             this.inSync = false;
         }
-        return result.map((val) => {});
+        return result.map((_) => {});
     }
     /**
      * get the user from the database again to resync it
