@@ -1,12 +1,10 @@
-import { Err, Ok, Result } from "./../types/result/result";
-import { PostgresError } from 'pg-error-enum';
-import { dbs } from "./dbs";
+import {Err, Ok, Result} from "./../types/result/result";
+import {dbs} from "./dbs";
 import {IAnswers} from "../interfaces/IAnswers";
 import {ChatInputCommandInteraction, EmbedBuilder} from "discord.js";
-import {QueryResult} from "pg";
-import { DbsUser } from "./user";
-import { DbsVak } from "./vak";
-import { None, Optional, Some } from "src/types/option/option";
+import {DbsUser} from "./user";
+import {DbsVak} from "./vak";
+import {None, Optional, Some} from "src/types/option/option";
 
 export class DbsAnswer implements IAnswers{
     //should not be used anymore, still need to delete in database
@@ -118,24 +116,23 @@ export class DbsAnswer implements IAnswers{
     public get oef(): string {
         return this._oef;
     }
-    
-//  TODO: refactor all this code cuse it is ass
+
     async get_reply(interaction: ChatInputCommandInteraction){
-        const filter = (m:any) => m.author.id === interaction.user.id;
-        await interaction.reply({ content: "reply to the message you wish to save", ephemeral: true, fetchReply: true})
+
+        await interaction.reply({ content: "reply to the message you wish to save", ephemeral: true, fetchReply: true});
         //haal de eerste reply op
+        const filter = (m:any) => m.author.id === interaction.user.id;
         let collected = await interaction.channel?.awaitMessages({filter, max: 1, time: 30000, errors: ['time']});
         if (collected == undefined) throw "no message collected";
-        let data = collected.first();
-        return data;
+        return collected.first();
 }
+
     async checkChannel(interaction: ChatInputCommandInteraction, conn: dbs){
-        const query = `
+        const result = await conn.query(`
         SELECT channelid, save
         FROM ugent.vakken
         where channelid=${interaction.channelId};
-        ` ;
-        const result = await conn.query(query);
+        `);
         return result.match(
             (queryresult) => {
                 if( queryresult.rowCount == 0) return false;
@@ -144,13 +141,14 @@ export class DbsAnswer implements IAnswers{
             (Errcode) => {return false}
         )
     }
+    //TODO: refactor all this code cuse it is ass
     async save(interaction: ChatInputCommandInteraction): Promise<void> {
         try {
             const conn = dbs.getInstance();
-            if (interaction.guild?.id != "978251400872075315") {
+            /*if (interaction.guild?.id != "978251400872075315") { //Not necesary anymore @milan confirm plss
                 interaction.reply("this feature is only available in the main server for the moment\njoin the main server here https://discord.gg/ebjWC3tBsa")
                 return
-            }
+            }*/
 
             let hoofdstuk = interaction.options.getString('hoofdstuk');
             let oef = interaction.options.getString('oef');
