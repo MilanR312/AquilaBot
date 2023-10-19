@@ -163,6 +163,14 @@ export class Optional<T> {
         return None();
     }
 
+    public match<U>(func_some: (v: T) => U, func_none: () => U): U {
+        if (this.isSome()){
+            return func_some(this.value as T);
+        } else {
+            return func_none();
+        }
+    }
+
 }
 export function Some<T>(value: T): Optional<T>{
     return new Optional<T>(true, value);

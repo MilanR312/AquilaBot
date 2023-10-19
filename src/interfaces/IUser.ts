@@ -8,5 +8,6 @@ export interface IUser{
 
     setBanned(banned:boolean): Promise<Result<void,number>>
     changeMoney(earned:number): Promise<Result<void,number>>
-    sync(): Promise<Result<void,number>>
+    pull(): Promise<Result<void,number>>
+    push(): Promise<Result<void, number>>
 }

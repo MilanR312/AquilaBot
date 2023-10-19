@@ -39,39 +39,6 @@ class dbs {
         return dbs.instance;
     }
 
-    async addUser(userid: String){
-        await this.pool.query(`insert into ugent.users (userid)
-                        values (${userid})`);
-    }
-
-    async checkUser(userid: String, func: String) {
-        let result = await this.pool.query(`SELECT banned from ugent.users
-                                    where userid = ${userid}`);
-        if (result.rowCount == 0){
-            console.log(`user ${userid} was not found in database, adding`);
-            await this.addUser(userid);
-            return true;
-        }
-    
-        if (result.rows[0].banned && func == "save"){
-            return false;
-        }
-    
-        return true;
-    }
-
-    async getUser(userid:string): Promise<Result<DbsUser, number>>{
-        try {
-            let result = await this.pool.query('SELECT * from ugent.users where userid = ${userid}');
-            //number here is temporary
-            if (result.rowCount != 1) return Err(1);
-            let userdata = result.rows[0];
-            let user = new DbsUser(userdata.userid, userdata.money, userdata.banned, true);
-            return Ok(user);
-        } catch (e: any){
-            return Err(e.code);
-        }
-    }
 
     async deleteUser(userid:string) {
         let result = await this.pool.query(`DELETE from ugent.users where userid = ${userid}`);

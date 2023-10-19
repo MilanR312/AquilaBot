@@ -1,7 +1,8 @@
-import { Result } from "./../types/result/result";
+import { Err, Ok, Result } from "./../types/result/result";
 import { PostgresError } from 'pg-error-enum';
 import { dbs } from "./dbs";
 import {IUser} from "../interfaces/IUser";
+import { None, Optional, Some } from "src/types/option/option";
 export class DbsUser implements IUser{
     private _banned: boolean;
     private _money: number;
@@ -11,11 +12,34 @@ export class DbsUser implements IUser{
     /**
      *
      */
-    constructor(id: string, money: number = 0, banned: boolean = false, in_sync: boolean = false) {
+    private constructor(id: string, money: number = 0, banned: boolean = false, in_sync: boolean = false) {
         this._banned = banned;
         this._money = money;
         this.userid = id;
         this.in_sync = in_sync;
+    }
+    /**
+     * generate a new user from userid
+     */
+    static newUser(id: string): DbsUser{
+        return new DbsUser(id);
+    }
+    /**
+     * returns Some(user) if the user existed
+     * or None if no user exists
+     */
+    static async getUser(id: string): Promise<Result<DbsUser,number>>{
+        let con = dbs.getInstance();
+        let result = await con.query(`SELECT * from ugent.users where userid = ${id}`);
+        return result.match(
+            (result) => {
+                if (result.rowCount != 1) return Err(1);
+                let userdata = result.rows[0];
+                let user = new DbsUser(userdata.userid, userdata.money, userdata.banned, true);
+                return Ok(user);
+            },
+            (err_code) => Err(err_code)
+        )
     }
 
     /**
@@ -82,11 +106,12 @@ export class DbsUser implements IUser{
     /**
      * get the user from the database again to resync it
      */
-    async sync(): Promise<Result<void, number>>{
-        let conn = dbs.getInstance();
+    async pull(): Promise<Result<void, number>>{
+        //js doesnt like it if i return Ok(void)
+        if (this.inSync) return Ok((()=>{})());
 
         //get the user again
-        let user = await conn.getUser(this.userid);
+        let user = await DbsUser.getUser(this.userid);
         //if we got a user update the values of this
         user.match(
             (user) => {
@@ -94,10 +119,30 @@ export class DbsUser implements IUser{
                 this._money = user.money;
                 this.inSync = true;
             },
-            (err_code) => {
+            () => {
             }
         );
         return user.map((e) => {});
+    }
+    /**
+     * try to push all the local changes again
+     * if a user exists, overwrite the values with the local ones
+     * if a user does not exist, create it in the dbs
+     */
+    async push(): Promise<Result<void, number>> {
+        if (this.inSync) return Ok((()=>{})());
+        let conn = dbs.getInstance();
+        let result = await conn.query(
+            `
+            INSERT INTO ugent.users (banned, money, userid)
+            VALUES(${this.banned},${this.money}, ${this.userid}) 
+            ON CONFLICT (userid) 
+            DO 
+                UPDATE SET banned=${this.banned}, money=${this.money};
+            `
+        );
+        this.inSync = result.isOk();
+        return result.map((e) => {});
     }
 
 }

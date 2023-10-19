@@ -1,26 +1,124 @@
-import { Result } from "./../types/result/result";
+import { Err, Ok, Result } from "./../types/result/result";
 import { PostgresError } from 'pg-error-enum';
 import { dbs } from "./dbs";
 import {IAnswers} from "../interfaces/IAnswers";
 import {ChatInputCommandInteraction, EmbedBuilder} from "discord.js";
 import {QueryResult} from "pg";
+import { DbsUser } from "./user";
+import { DbsVak } from "./vak";
+import { None, Optional, Some } from "src/types/option/option";
 
-export class DbAnswers implements IAnswers{
-    private readonly _userid: string;
+export class DbsAnswer implements IAnswers{
+    //should not be used anymore, still need to delete in database
+    //messageid is unique and can be used as index
+    //private readonly _answerid: string;
+
+    private readonly _user: DbsUser;
+    private readonly _vak: DbsVak;
+    
     private readonly _messageid: string;
-    private readonly _answerid: string;
-    private readonly _vak: string;
     private _chapter: string;
     private _oef: string;
 
-    constructor(userid:string, messageid: string, answerid:string, vak:string, chapter:string, oef:string) {
-        this._userid = userid;
+    private _in_sync: boolean;
+
+    private constructor(messageid: string, chapter:string, oef:string,user:DbsUser, vak: DbsVak, in_sync: boolean= false) {
+        this._user = user;
         this._messageid = messageid;
-        this._answerid = answerid;
         this._vak = vak;
         this._chapter = chapter;
         this._oef = oef;
+        this._in_sync = in_sync;
     }
+    static newAnswer(message_id: string, chapter: string, oef: string, user: DbsUser, vak: DbsVak): DbsAnswer{
+        return new DbsAnswer(message_id,chapter, oef, user, vak);
+    }
+    static async getAnswer(message_id: string): Promise<Result<DbsAnswer, number>>{
+        let con = dbs.getInstance();
+        let result = await con.query(`
+            select *
+            from ugent.answers
+            where messageid=${message_id};
+        `);
+        let out = await result.match(
+            async (result) => {
+                if (result.rowCount != 1) return Err<DbsAnswer,number>(1);
+                let answer_data = result.rows[0];
+
+                //get user and channel
+                let userresult = await DbsUser.getUser(answer_data.userid);
+                let vakresult = await DbsVak.getVak(answer_data.vak);
+                
+                if (userresult.isErr()) return Err<DbsAnswer,number>(2);
+                let user = userresult.unwrap();
+
+                if (vakresult.isErr()) return Err<DbsAnswer,number>(3);
+                let vak = vakresult.unwrap();
+
+                let answer = new DbsAnswer(answer_data.messageid, answer_data.chapter, answer_data.oef, user, vak, true);
+                return Ok<DbsAnswer,number>(answer);
+            },
+            async (err) => Err<DbsAnswer,number>(err)
+        );
+        return out
+    }
+    static async getAnswerList(vak: DbsVak, chapter: string, oef: string): Promise<Optional<Array<DbsAnswer>>>{
+        //indien het vak niet toelaat antwoorden op te slaan, dan zal er ook sowieso geen antwoord in de database zijn
+        if (vak.allowedSave == false) return None();
+        let con = dbs.getInstance();
+        let result = await con.query(`
+            SELECT messageid, userid FROM ugent.answers ans
+            inner join ugent.users us using(userid)
+            where ans.vak = ${vak.vakId} and ans.chapter = '${chapter}' and ans.oef = '${oef}'
+            ORDER BY us."money" DESC LIMIT 10
+            ;
+        `);
+        if (result.isErr()) return None();
+        let answers = result.unwrap();
+        if (answers.rowCount == 0) return None();
+        //voor performance redenen houden we hashmap van alle users bij
+        let queried_users = new Map<string, DbsUser>();
+
+        let out: DbsAnswer[] = [];
+
+        for (let row of answers.rows){
+            let userid = row.userid;
+            if (!queried_users.has(userid)){
+                let user = await DbsUser.getUser(userid);
+                user.map((user) => queried_users.set(userid, user));
+            }
+            let answer = new DbsAnswer(
+                row.messageid, 
+                chapter, 
+                oef, 
+                queried_users.get(userid) as DbsUser, 
+                vak, 
+                true
+            );
+            out.push(answer);
+        }
+        return Some(out);
+    }
+    //answer is only in sync if both channel and user are aswell
+    public get inSync(): boolean {
+        return this._in_sync && this._vak.inSync && this._user.inSync;
+    }
+    private set inSync(newval: boolean){
+        this._in_sync = newval;
+    }
+    public get user(): DbsUser{
+        return this._user;
+    }
+    public get vak(): DbsVak{
+        return this._vak;
+    }
+    public get chapter(): string {
+        return this._chapter;
+    }
+    public get oef(): string {
+        return this._oef;
+    }
+    
 //  TODO: refactor all this code cuse it is ass
     async get_reply(interaction: ChatInputCommandInteraction){
         const filter = (m:any) => m.author.id === interaction.user.id;
