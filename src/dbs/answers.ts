@@ -116,6 +116,19 @@ export class DbsAnswer implements IAnswers{
     public get oef(): string {
         return this._oef;
     }
+    /**
+     * the push from other dbs classes renamed to make more sense?
+     */
+    public async save(): Promise<Result<void, number>>{
+        if (this.inSync) return Ok((()=>{})());
+        let conn = dbs.getInstance();
+        let result = await conn.query(`
+            insert into ugent.answers (userid, messageid, vak, chapter, oef)
+            values (${this.user.id}, ${this._messageid}, ${this.vak.vakId}, ${this.chapter}, ${this.oef})
+        `);
+        this.inSync = result.isOk();
+        return result.map((_) => {});
+    }
 
     async get_reply(interaction: ChatInputCommandInteraction){
 
@@ -142,13 +155,13 @@ export class DbsAnswer implements IAnswers{
         )
     }
     //TODO: refactor all this code cuse it is ass
-    async save(interaction: ChatInputCommandInteraction): Promise<void> {
+   /* async save(interaction: ChatInputCommandInteraction): Promise<void> {
         try {
             const conn = dbs.getInstance();
             /*if (interaction.guild?.id != "978251400872075315") { //Not necesary anymore @milan confirm plss
                 interaction.reply("this feature is only available in the main server for the moment\njoin the main server here https://discord.gg/ebjWC3tBsa")
                 return
-            }*/
+            }
 
             let hoofdstuk = interaction.options.getString('hoofdstuk');
             let oef = interaction.options.getString('oef');
@@ -242,5 +255,5 @@ export class DbsAnswer implements IAnswers{
         } catch (err) {
             console.log(`saveanswer err ${err}`);
         }
-    }
+    }*/
 }

@@ -57,6 +57,9 @@ export class DbsUser implements IUser{
     public get banned(): boolean {
         return this._banned;
     }
+    public get id(): string {
+        return this.userid;
+    }
     /**
      * 
      * @param banned set if a user needs to be banned from saving answer
