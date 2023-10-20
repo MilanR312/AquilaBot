@@ -1,4 +1,4 @@
-import {Err, Ok, Result} from "./../types/result/result";
+import {Err, Ok, Result} from "../types/result/result";
 import {dbs} from "./dbs";
 import {IAnswers} from "../interfaces/IAnswers";
 import {ChatInputCommandInteraction, EmbedBuilder} from "discord.js";

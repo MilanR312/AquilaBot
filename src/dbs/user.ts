@@ -1,4 +1,4 @@
-import { Err, Ok, Result } from "./../types/result/result";
+import { Err, Ok, Result } from "../types/result/result";
 import { PostgresError } from 'pg-error-enum';
 import { dbs } from "./dbs";
 import {IUser} from "../interfaces/IUser";
