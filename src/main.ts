@@ -3,8 +3,7 @@
 import { REST, Routes , Collection, EmbedBuilder, Client, GatewayIntentBits, ChatInputCommandInteraction, AutocompleteInteraction, ApplicationCommand, ActivityType} from "discord.js";
 import * as fs from 'fs';
 import * as CryptoTs from 'crypto-ts';
-
-import { Command, SlashCommand } from "./types";
+import { ISlashCommand } from "./interfaces/ISlashCommand";
 
 const permissions = [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages,
                     GatewayIntentBits.MessageContent, GatewayIntentBits.DirectMessages,
@@ -14,7 +13,6 @@ const permissions = [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages,
 const client = new Client({intents: permissions});
 
 import * as dotenv from 'ts-dotenv';
-import { pool } from "./dbs/dbs";
 
 const env = dotenv.load({
     TOKEN: String,
@@ -35,8 +33,8 @@ const rest = new REST({ version: '10'}).setToken(env.TOKEN);
 
 
 
-const commands: SlashCommand[] = [];
-client.slashCommands = new Collection<string, SlashCommand>();
+const commands: ISlashCommand[] = [];
+client.slashCommands = new Collection<string, ISlashCommand>();
 const commandFiles = fs.readdirSync('./src/other_commands')
                             .filter(file => file.endsWith(".ts"));
 
@@ -61,8 +59,8 @@ const global = false;
 
 (async () => {
     try {
-        let globalCommands:SlashCommand[] = (global) ? commands : [];
-        let localCommands:SlashCommand[] = (!global) ? commands: [];
+        let globalCommands:ISlashCommand[] = (global) ? commands : [];
+        let localCommands:ISlashCommand[] = (!global) ? commands: [];
         
         await rest.put(
             Routes.applicationCommands(env.BOT_ID),
