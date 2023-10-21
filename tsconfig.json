@@ -20,6 +20,9 @@
         "sourceMap": false,
         "baseUrl": "./"
     },
+    "plugins": [
+        { "transform": "ts-macros"}
+    ],
     "files": [
         "src/main.ts"
     ],

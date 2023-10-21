@@ -1,4 +1,5 @@
 import { Optional, Some, None } from "../option/option";
+import { $$escape } from "ts-macros"
 export class Result<T,E> {
     _is_ok : boolean;
     value: T | E;
@@ -113,12 +114,18 @@ export class Result<T,E> {
     }
     public match<R>(func_ok: (v: T) => R, func_err: (v: E) => R ): R {
         return this.mapOrElse(func_err, func_ok);
-    }
-    
+    }    
 }
 export function Ok<T,E>(value: T): Result<T, E>{
     return new Result<T,E>(true, value);
 }
 export function Err<T,E>(value: E): Result<T,E>{
     return new Result<T,E>(false, value);
+}
+export function WrapErr<T,E>(value: T | null | undefined, err: E): Result<T, E>{
+    if (value == null || value == undefined){
+        return Err(err);
+    } else {
+        return Ok(value as T);
+    }
 }

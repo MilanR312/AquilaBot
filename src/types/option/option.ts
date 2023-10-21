@@ -1,4 +1,6 @@
 import { Result, Ok, Err } from "../result/result";
+import { $$escape } from "ts-macros"
+
 export class Optional<T> {
     _is_some : boolean;
     value: T | null;
@@ -170,11 +172,17 @@ export class Optional<T> {
             return func_none();
         }
     }
-
 }
 export function Some<T>(value: T): Optional<T>{
     return new Optional<T>(true, value);
 }
 export function None<T>(): Optional<T>{
     return new Optional<T>(false, null);
+}
+export function Wrap<T>(value: T | null | undefined): Optional<T>{
+    if (value === null || value === undefined){
+        return new Optional<T>(true, value as T);
+    } else {
+        return new Optional<T>(false, null);
+    }
 }
