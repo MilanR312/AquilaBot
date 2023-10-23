@@ -41,6 +41,27 @@ export class DbsUser implements IUser{
             (err_code) => Err(err_code)
         )
     }
+    /**
+     * gets or creates a user in the database
+     * returns Ok(user) with an in sync (new or old) user
+     * returns Err(code) if it failed to make a user
+     * @param id 
+     */
+    static async getUserOrCreate(id: string): Promise<Result<DbsUser, number>>{
+        let user = await DbsUser.getUser(id);
+
+        let out = await user.match(
+            async user => Ok<DbsUser, number>(user),
+            async err => {
+                //create a new user
+                let new_user = DbsUser.newUser(id);
+                let res = await new_user.push();
+
+                return res.map(() => new_user);
+            }
+        )
+        return out;
+    }
 
     /**
      * returns if the user instance is in sync with the database 
