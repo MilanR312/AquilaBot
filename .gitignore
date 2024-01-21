@@ -14,5 +14,5 @@ config.dev.json
 config.prod.json
 tsconfig.json
 yarn.lock
-.idea
+.idea/
 dist/
