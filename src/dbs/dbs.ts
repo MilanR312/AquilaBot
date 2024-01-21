@@ -1,6 +1,6 @@
 import { Pool, QueryResult } from "pg";
 import { PostgresError } from "pg-error-enum";
-import { Err, Ok, Result } from "src/types/result/result";
+import { Err, Ok, Result } from "../types/result/result";
 import * as dotenv from 'ts-dotenv';
 import { DbsUser } from "./user";
 

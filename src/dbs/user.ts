@@ -2,7 +2,7 @@ import { Err, Ok, Result } from "../types/result/result";
 import { PostgresError } from 'pg-error-enum';
 import { dbs } from "./dbs";
 import {IUser} from "../interfaces/IUser";
-import { None, Optional, Some } from "src/types/option/option";
+import { None, Optional, Some } from "../types/option/option";
 export class DbsUser implements IUser{
     private _banned: boolean;
     private _money: number;

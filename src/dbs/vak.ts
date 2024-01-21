@@ -1,5 +1,5 @@
 import { userInfo } from "os";
-import { Err, Ok, Result } from "src/types/result/result";
+import { Err, Ok, Result } from "../types/result/result";
 import { dbs } from "./dbs";
 
 export class DbsVak{

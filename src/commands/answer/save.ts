@@ -1,10 +1,10 @@
 import { ChatInputCommandInteraction, Guild, Message, SlashCommandBuilder, SlashCommandSubcommandBuilder } from "discord.js";
-import { Err, Ok, Result, WrapErr } from "src/types/result/result";
-import { serverdata } from "src/data/server";
-import { Wrap } from "src/types/option/option";
-import { $try } from "src/types/try"
-import { DbsUser } from "src/dbs/user";
-import { DbsVak } from "src/dbs/vak";
+import { Err, Ok, Result, WrapErr } from "../../types/result/result";
+import { serverdata } from "../../data/server";
+import { Wrap } from "../../types/option/option";
+import { $try } from "../../types/try"
+import { DbsUser } from "../../dbs/user";
+import { DbsVak } from "../../dbs/vak";
 
 export module save {
     export var commandname = "save";
