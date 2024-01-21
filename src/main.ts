@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import * as CryptoTs from 'crypto-ts';
 import { ISlashCommand } from "./interfaces/ISlashCommand";
 
+import { Command, SlashCommand } from "./types/types";
 const permissions = [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages,
                     GatewayIntentBits.MessageContent, GatewayIntentBits.DirectMessages,
                     GatewayIntentBits.DirectMessageTyping, GatewayIntentBits.GuildMessageReactions ];
@@ -31,36 +32,15 @@ process.argv.forEach( v => {
 
 const rest = new REST({ version: '10'}).setToken(env.TOKEN);
 
-
-
-const commands: ISlashCommand[] = [];
-client.slashCommands = new Collection<string, ISlashCommand>();
-const commandFiles = fs.readdirSync('./src/other_commands')
-                            .filter(file => file.endsWith(".ts"));
-
-
-
-
-const addCommand = (command:any) => {
-    commands.push(command.data.toJSON());
-    client.slashCommands.set(command.data.name, command);
-}
-
-for (const file of commandFiles){
-    const command = require(`./other_commands/${file}`);
-    if (Array.isArray(command)){
-        command.forEach( comm => addCommand(comm));
-    } else {
-        addCommand(command);
-    }
-}
+import {commands, slash_commands} from "./commands/mod"
+client.slashCommands = slash_commands;
 
 const global = false;
 
 (async () => {
     try {
-        let globalCommands:ISlashCommand[] = (global) ? commands : [];
-        let localCommands:ISlashCommand[] = (!global) ? commands: [];
+        let globalCommands = (global) ? commands : [];
+        let localCommands = (!global) ? commands: [];
         
         await rest.put(
             Routes.applicationCommands(env.BOT_ID),
@@ -76,9 +56,8 @@ const global = false;
 })();
 
 
-import { answerAutocomplete } from "./other_commands/saveAnswerSubCommands/autocomplete";
 client.on('interactionCreate',async interaction => {
-    if (interaction.isAutocomplete()){
+    /*if (interaction.isAutocomplete()){
         const subCommand = interaction.commandName;
         switch (subCommand){
             case 'answer': 
@@ -86,7 +65,7 @@ client.on('interactionCreate',async interaction => {
             break
         }
         return;
-    }
+    }*/
     if (!interaction.isCommand()) return;
 
     let isTester = env.TESTERS.split(" ").includes(interaction.user.id);
@@ -108,12 +87,11 @@ client.on('interactionCreate',async interaction => {
     }
 });
 
-import {createPoll} from "./helper/pollCreator";
-let i = 1;
+
 client.on("messageCreate", async (message) => {
-    if (message.author.bot) return;
+    /*if (message.author.bot) return;
     if (!message.content.startsWith("Aquila")) return;
-    await createPoll(message);
+    await createPoll(message);*/
 });
 
 

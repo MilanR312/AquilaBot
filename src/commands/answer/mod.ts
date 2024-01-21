@@ -1,10 +1,10 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 
 import {save} from "./save";
-import {get} from "../../other_commands/saveAnswerSubCommands/get";
+//import {get} from "../../other_commands/saveAnswerSubCommands/get";
 
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
     .setName('answer')
     .setDescription('Answer opslaan')
@@ -69,9 +69,9 @@ module.exports = {
             case save.commandname:
                 await save.Function(interaction);
                 break;
-            case 'get':
+            /*case 'get':
                 await get(interaction);
-                break;
+                break;*/
             }
     }
 }
