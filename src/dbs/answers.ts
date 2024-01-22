@@ -4,7 +4,7 @@ import {IAnswers} from "../interfaces/IAnswers";
 import {ChatInputCommandInteraction, EmbedBuilder} from "discord.js";
 import {DbsUser} from "./user";
 import {DbsVak} from "./vak";
-import {None, Optional, Some} from "src/types/option/option";
+import {None, Optional, Some} from "../types/option/option";
 
 export class DbsAnswer implements IAnswers{
     //should not be used anymore, still need to delete in database

@@ -1,4 +1,4 @@
-import { Result } from "src/types/result/result";
+import { Result } from "../types/result/result";
 
 export interface IAnswers {
     save(): Promise<Result<void, number>>

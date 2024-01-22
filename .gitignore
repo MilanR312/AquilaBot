@@ -2,7 +2,7 @@
 .vagrant/
 .vscode
 
-/node_modules/*
+node_modules/
 storage/
 
 
@@ -14,4 +14,5 @@ config.dev.json
 config.prod.json
 tsconfig.json
 yarn.lock
-.idea
+.idea/
+dist/

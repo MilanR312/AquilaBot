@@ -1,5 +1,5 @@
 import { Collection } from "discord.js";
-import * as answer from "src/commands/answer/mod";
+import * as answer from "./answer/mod";
 import { ISlashCommand } from "src/interfaces/ISlashCommand";
 
 const mods = [answer]
